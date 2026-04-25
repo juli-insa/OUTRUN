@@ -88,11 +88,6 @@ class Road {
             world.y = Math.sin(hillAngle / 180 * Math.PI) * 2000;
         }
 
-        if (i === 1800) {
-            world.y             = Math.sin(Math.PI * 0.5) * 500;
-            line.colors.road    = "yellow";
-        }
-
         if (i > 1000 && i < 1720) {
             previousTunnelSegment = this.#addTunnel(line, i, world.y, previousTunnelSegment);
         }
@@ -117,7 +112,7 @@ class Road {
         tunnel.rightFace.offsetX2 = 1.3;
 
         if (isFirst) {
-            tunnel.title      = "Tunnel Racing Pseudo 3D";
+            tunnel.title      = "";
             line.colors.tunnel = "#fff";
         } else {
             tunnel.previousSegment      = previousTunnelSegment;
@@ -141,14 +136,40 @@ class Road {
             line.sprites.push(tree);
         }
 
-        if (i === 500) {
+        if (i === 460) {
             const tree2   = new Sprite();
             tree2.image   = resource.get("tree2");
             tree2.offsetX = -1;
             line.sprites.push(tree2);
         }
+            //add a second same tree after the first 
+        if (i === 490) {
+            const tree3   = new Sprite();
+            tree3.image   = resource.get("tree2");
+            tree3.offsetX = -1;
+            line.sprites.push(tree3);
 
-        if (i === 5) {
+        }
+        if (i ===520) {
+            const tree4   = new Sprite();
+            tree4.image   = resource.get("tree2");
+            tree4.offsetX = -1;
+            line.sprites.push(tree4);
+        }
+        if (i === 540) {
+            const tree5   = new Sprite();
+            tree5.image   = resource.get("tree2");
+            tree5.offsetX = -1;
+            line.sprites.push(tree5);
+        }
+        if (i === 570) {
+            const tree6   = new Sprite();
+            tree6.image   = resource.get("tree2");
+            tree6.offsetX = -1;
+            line.sprites.push(tree6);
+        }
+
+        if (i === 20) {
             const finish    = new Sprite();
             finish.image    = resource.get("finish-line");
             finish.offsetX  = 0;

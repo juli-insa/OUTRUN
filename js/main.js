@@ -1,12 +1,11 @@
 /**
  * @file main.js
- * Entry point. Creates all objects once, then delegates every frame
- * to the SceneManager which routes to the correct scene.
+ * Entry point.
+ * 1. Boots the Phaser layer (audio, particles, tweens, gamepad).
+ * 2. Loads game assets.
+ * 3. Initialises the pseudo-3D engine and SceneManager.
  */
 
-// ── Game Loop ─────────────────────────────────────────────────────────────────
-
-/** @param {number} time  timestamp from requestAnimationFrame */
 function loop(time, sceneManager) {
     requestAnimationFrame((t) => loop(t, sceneManager));
 
@@ -17,8 +16,6 @@ function loop(time, sceneManager) {
     sceneManager.update(deltaMs);
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-
 function init(time) {
     const render = new Render(CANVAS.getContext("2d"));
     const camera = new Camera();
@@ -26,7 +23,6 @@ function init(time) {
     const road   = new Road();
     const state  = new GameState();
 
-    // ── Sprites ────────────────────────────────────────────────
     player.sprite.image       = resource.get("car");
     player.sprite.frameWidth  = CONFIG.PLAYER.FRAME_WIDTH;
     player.sprite.frameHeight = CONFIG.PLAYER.FRAME_HEIGHT;
@@ -39,22 +35,27 @@ function init(time) {
     player.spriteCardobla.totalFrames = CONFIG.PLAYER.TOTAL_FRAMES;
     player.spriteCardobla.frameSpeed  = CONFIG.PLAYER.FRAME_SPEED;
 
-    // ── Road ───────────────────────────────────────────────────
     road.create();
 
-    // ── Scene manager ──────────────────────────────────────────
+    const sky = new Sky();
+    sky.init(resource.get("nuve"));
+
     const sceneManager = new SceneManager();
-    sceneManager.init(render, camera, player, road, state);
+    sceneManager.init(render, camera, player, road, state, sky);
 
     loop(time, sceneManager);
 }
 
-// ── Asset Loading ─────────────────────────────────────────────────────────────
+// ── Boot sequence ─────────────────────────────────────────────────────────────
+// 1. Start Phaser (async — loads its canvas and audio context)
+phaserLayer.init();
 
+// 2. Load game image assets, then start the engine
 resource
     .add("tree1",       "./assets/foliagePack_005.png")
     .add("car",         "./assets/car.png")
-    .add("cardobla",    "./assets/cardobla.png")
+    .add("cardobla",    "./assets/cardobla2.png")
     .add("finish-line", "./assets/finish.png")
     .add("tree2",       "./assets/foliagePack_013.png")
+    .add("nuve",        "./assets/nuve.png")
     .load(() => requestAnimationFrame((t) => init(t)));

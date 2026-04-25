@@ -19,6 +19,7 @@ class SceneManager {
     /** @type {IntroScene}    */ #intro    = null;
     /** @type {GameplayScene} */ #gameplay = null;
     /** @type {FinishScene}   */ #finish   = null;
+    /** @type {Sky}           */ #sky      = null;
 
     /**
      * @param {Render}    render
@@ -26,13 +27,15 @@ class SceneManager {
      * @param {Player}    player
      * @param {Road}      road
      * @param {GameState} state
+     * @param {Sky}       sky
      */
-    init(render, camera, player, road, state) {
+    init(render, camera, player, road, state, sky) {
         this.#render   = render;
         this.#camera   = camera;
         this.#player   = player;
         this.#road     = road;
         this.#state    = state;
+        this.#sky      = sky;
 
         this.#intro    = new IntroScene(this);
         this.#gameplay = new GameplayScene(this);
@@ -48,6 +51,7 @@ class SceneManager {
     get player()   { return this.#player;   }
     get road()     { return this.#road;     }
     get state()    { return this.#state;    }
+    get sky()      { return this.#sky;      }
     get current()  { return this.#current;  }
 
     /**

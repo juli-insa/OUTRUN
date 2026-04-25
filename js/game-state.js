@@ -17,7 +17,7 @@ class GameState {
 
     // ── Countdown timer ───────────────────────────────────────
     /** Starting seconds for each stage */
-    static START_TIME = 75;
+    static START_TIME = 10;
     /** Bonus seconds added when crossing a checkpoint/lap */
     static CHECKPOINT_BONUS = 20;
 

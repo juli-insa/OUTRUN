@@ -36,6 +36,7 @@ class Camera {
 
     /**
      * Move the camera along the road each frame.
+     * Accepts keyboard AND gamepad input.
      * @param {Road} road
      */
     update(road) {
@@ -45,11 +46,23 @@ class Camera {
         const speed  = timeObject.currentFramerate * step * delta;
         const maxAcc = CONFIG.CAMERA.MAX_ACCELERATION;
 
-        if (keyboard.isKeyDown("arrowup")) {
+        // ── Input: keyboard + gamepad ──────────────────────────
+        const gp = phaserLayer.gamepad;
+        const accelInput = keyboard.isKeyDown("arrowup")
+            || gp.isDown(GamepadButtons.A)
+            || gp.isDown(GamepadButtons.RT)
+            || gp.axes().ly < -0.3;
+
+        const brakeInput = keyboard.isKeyDown("arrowdown")
+            || gp.isDown(GamepadButtons.B)
+            || gp.isDown(GamepadButtons.LT)
+            || gp.axes().ly > 0.3;
+
+        if (accelInput) {
             this.cursor += step + this.acceleration;
             if (this.acceleration < maxAcc) this.acceleration += speed;
 
-        } else if (keyboard.isKeyDown("arrowdown")) {
+        } else if (brakeInput) {
             this.cursor -= step;
 
         } else if (this.acceleration > 0) {

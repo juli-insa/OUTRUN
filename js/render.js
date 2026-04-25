@@ -128,8 +128,8 @@ class Render {
         const mid     = camera.screen.midpoint;
         const FACTOR  = 1 / 3;
         const offsetY = sprite.offsetY || 1;
-        const destW   = (sprite.width  * scale * mid.x) * (roadWidth * sprite.scaleX / (player.width ?? 64)) * FACTOR;
-        const destH   = (sprite.height * scale * mid.x) * (roadWidth * sprite.scaleY / (player.width ?? 64)) * FACTOR;
+        const destW   = (sprite.width  * scale * mid.x) * (roadWidth * sprite.scaleX / (player.width || 64)) * FACTOR;
+        const destH   = (sprite.height * scale * mid.x) * (roadWidth * sprite.scaleY / (player.width || 64)) * FACTOR;
 
         const drawX = Math.round(destX - destW * 0.5);
         const drawY = Math.round(destY - destH * offsetY);

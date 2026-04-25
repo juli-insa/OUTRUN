@@ -4,7 +4,7 @@
  * time tracking, and sprite classes.
  */
 
-const CANVAS = document.querySelector("canvas");
+const CANVAS = document.querySelector("#game-canvas");
 
 // ── Keyboard ──────────────────────────────────────────────────────────────────
 

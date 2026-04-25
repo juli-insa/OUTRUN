@@ -9,17 +9,36 @@
     <link rel="stylesheet" type="text/css" href="./css/main.css"/>
 </head>
 <body>
-    <canvas width="800" height="600"></canvas>
+    <!--
+        Two canvases, both centred:
+          #game-canvas  → pseudo-3D engine (our Canvas 2D code)
+          #phaser-canvas → added dynamically by Phaser, sits on top
+    -->
+    <canvas id="game-canvas" width="800" height="600"></canvas>
 
-    <!-- Load order matters: config → utilities → classes → entry point -->
+    <!--
+        Load order:
+        1. Phaser 3 (CDN)
+        2. config   — constants
+        3. util     — Keyboard, ResourceLoader, TimeTracker, Sprite, Tunnel
+        4. phaser-layer — PhaserLayer facade (needs Phaser + CONFIG)
+        5. game-state
+        6. render / camera / player / line / road
+        7. scenes
+        8. main     — entry point (calls phaserLayer.init())
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
     <script src="./js/config.js"></script>
     <script src="./js/util.js"></script>
+    <script src="./js/phaser-layer.js"></script>
     <script src="./js/game-state.js"></script>
     <script src="./js/render.js"></script>
     <script src="./js/camera.js"></script>
     <script src="./js/player.js"></script>
     <script src="./js/line.js"></script>
     <script src="./js/road.js"></script>
+    <script src="./js/sky.js"></script>
     <script src="./js/scene-manager.js"></script>
     <script src="./js/scene-intro.js"></script>
     <script src="./js/scene-gameplay.js"></script>
