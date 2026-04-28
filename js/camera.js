@@ -40,6 +40,7 @@ class Camera {
      * @param {Road} road
      */
     update(road) {
+        
         const step   = road.segmentLength;
         const length = road.trackLength;
         const delta  = timeObject.delta / 400_000;
@@ -47,6 +48,7 @@ class Camera {
         const maxAcc = CONFIG.CAMERA.MAX_ACCELERATION;
 
         // ── Input: keyboard + gamepad ──────────────────────────
+        
         const gp = phaserLayer.gamepad;
         const accelInput = keyboard.isKeyDown("arrowup")
             || gp.isDown(GamepadButtons.A)

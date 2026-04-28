@@ -107,7 +107,7 @@ class IntroScene {
 
         ctx.fillStyle = "#ffffff";
         ctx.font      = "20px monospace";
-        ctx.fillText("by JULIETA INSAURRALDE", W / 2, H * 0.30);
+        ctx.fillText("REMAKE by JULIETA INSAURRALDE", W / 2, H * 0.30);
         ctx.restore();
 
         // Blinking prompt

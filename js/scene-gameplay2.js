@@ -1,35 +1,38 @@
 /**
- * @file scene-gameplay.js
+ * @file scene-gameplay2.js
  * GAMEPLAY scene — OutRun style HUD + audio + gamepad.
  */
 
-const TOTAL_LAPS = 1;
+//const TOTAL_LAPS = 1;
 
-const HUD = Object.freeze({
-    BAR_H:        80,
-    PAD_X:        18,
-    LABEL_SIZE:   23,
-    SCORE_SIZE:   32,
-    STAGE_SIZE:   28,
-    TIMER_SIZE:   46,
-    SPEED_SIZE:   44,
-    SPEED_X:      80,
-    FONT:         "monospace",
-    LABEL_COLOR:  "#ffffff",
-    SCORE_COLOR:  "#868686",
-    SPEED_COLOR:  "#ffffff",
-    TIMER_NORMAL: "#fffc58",
-    TIMER_LOW:    "#ff0000",
-});
+//const HUD = Object.freeze({
+   // BAR_H:        80,
+   // PAD_X:        18,
+   // LABEL_SIZE:   23,
+   // SCORE_SIZE:   32,
+   // STAGE_SIZE:   28,
+   // TIMER_SIZE:   46,
+   // SPEED_SIZE:   44,
+   // SPEED_X: 80,
+   // FONT:         "monospace",
+   // LABEL_COLOR:  "#ffffff",
+   // SCORE_COLOR:  "#868686",
+   // HISCORE_COLOR:"#969696",
+   // SPEED_COLOR:  "#ffffff",
+   // TIMER_NORMAL: "#fffc58",
+  //  TIMER_LOW:    "#ff0000",
+    
+    //BAR_COLOR:    "rgba(0,0,0,0.82)",
+//});
 
-class GameplayScene {
+class GameplayScene2 {
     /** @type {SceneManager} */ #mgr;
 
-    #prevSegmentIndex = -1;
-    #FINISH_INDEX     = CONFIG.FINISH_LINE_INDEX;
-    #lap              = 0;
-    #crossingCooldown = false;
-    #prevSpeed        = 0;
+    #prevSegmentIndex  = -1;
+    #FINISH_INDEX      = CONFIG.FINISH_LINE_INDEX;
+    #lap               = 0;
+    #crossingCooldown  = false;
+    #prevSpeed         = 0;   // to detect engine sound changes
 
     /** @param {SceneManager} mgr */
     constructor(mgr) { this.#mgr = mgr; }
@@ -37,11 +40,12 @@ class GameplayScene {
     enter() {
         const { camera, road, state } = this.#mgr;
         state.reset();
-        camera.cursor          = -road.segmentLength * road.rumbleLength;
-        camera.acceleration    = 0;
-        this.#mgr.player.x     = 0;
+        camera.cursor       = -road.segmentLength * road.rumbleLength;
+        camera.acceleration = 0;
+        this.#mgr.player.x  = 0;
         this.#prevSegmentIndex = -1;
-        this.#lap              = 0;
+        //lap // stage / -1 para 2 vueltas
+        this.#lap              = -1;
         this.#crossingCooldown = false;
         this.#prevSpeed        = 0;
 
@@ -65,8 +69,8 @@ class GameplayScene {
         camera.update(road);
 
         // Feed the active curve to the player so it can drift
-        const activeSegment = road.getSegment(camera.cursor);
-        player.currentCurve = activeSegment ? activeSegment.curve : 0;
+        const activeSegment  = road.getSegment(camera.cursor);
+        player.currentCurve  = activeSegment ? activeSegment.curve : 0;
         player.update(speed);
 
         // ── Finish-line / lap detection ────────────────────────
@@ -79,11 +83,12 @@ class GameplayScene {
             this.#lap++;
             state.addCheckpointBonus();
 
+            // Checkpoint SFX + particle burst at finish line position
             phaserLayer.audio.playSFX("sfx-checkpoint");
-            phaserLayer.particles.burst(W / 2, H * 0.0, 40);
+            phaserLayer.particles.burst(W / 2, H * 0., 40);
 
             if (this.#lap >= TOTAL_LAPS) {
-                this.#mgr.transitionTo(CONFIG.SCENES.GAMEPLAY2);
+                this.#mgr.transitionTo(CONFIG.SCENES.FINISH);
                 return;
             }
         }
@@ -119,31 +124,43 @@ class GameplayScene {
 
     #drawHUD(ctx, W, H, state) {
         const barY = H - HUD.BAR_H;
+        const barX = 0;
 
+      //  ctx.save();
+      //  ctx.fillStyle = HUD.BAR_COLOR;
+       // ctx.fillRect(0, barY, W, HUD.BAR_H);
+
+       // ctx.strokeStyle = "#ff8a2b";
+       // ctx.lineWidth   = 1.5;
+       // ctx.beginPath();
         ctx.moveTo(0, barY);
         ctx.lineTo(W, barY);
+        //ctx.stroke();
 
         // SCORE
-        this.#label(ctx, "SCORE", HUD.PAD_X, barY - 500);
-        this.#value(ctx, this.#padScore(state.score), HUD.PAD_X, barY - 480, HUD.SCORE_COLOR, HUD.SCORE_SIZE);
+        this.#label(ctx, "SCORE",    HUD.PAD_X, barY -500 );
+        this.#value(ctx, this.#padScore(state.score),   HUD.PAD_X, barY -480, HUD.SCORE_COLOR,   HUD.SCORE_SIZE, );
+        //this.#label(ctx, "HI-SCORE", HUD.PAD_X, barY + 52);
+        //this.#value(ctx, this.#padScore(state.hiScore), HUD.PAD_X, barY + 64, HUD.HISCORE_COLOR, HUD.SCORE_SIZE - 5);
 
         // SPEED
-        const cx = HUD.SPEED_X;
+
+       const cx = HUD.SPEED_X;
         this.#label(ctx, "KM/H", cx, barY + 10, "center");
         this.#value(ctx, String(state.speed).padStart(3, "0"), cx, barY + 26, HUD.SPEED_COLOR, HUD.SPEED_SIZE, "center");
 
-        // STAGE
         ctx.font         = `bold ${HUD.STAGE_SIZE}px ${HUD.FONT}`;
         ctx.fillStyle    = "#eb3737";
         ctx.textAlign    = "right";
         ctx.textBaseline = "top";
-        ctx.fillText(`STAGE 1/${CONFIG.SCENES.TOTAL_STAGES}`, W - HUD.PAD_X, barY + 20);
+       ctx.fillText(`STAGE 2/${CONFIG.SCENES.TOTAL_STAGES}`, W - HUD.PAD_X, barY + 20);
 
         // TIMER
         const timeLeft   = state.timeLeft;
         const isLow      = timeLeft <= 10;
         const timerColor = isLow ? HUD.TIMER_LOW : HUD.TIMER_NORMAL;
         const pulse      = isLow && Math.floor(Date.now() / 250) % 2 === 0;
+        
 
         this.#label(ctx, "TIME", W - HUD.PAD_X, barY - 500, "right");
         if (!pulse) {

@@ -144,10 +144,22 @@ class Render {
             const fc      = sprite.getFrameCoords();
             const srcH    = fc.height - (fc.height * clipH / destH);
             this.#ctx.drawImage(sprite.image, fc.x, fc.y, fc.width, srcH, drawX, drawY, drawW, drawH);
-        } else {
-            const srcH = sprite.height - sprite.height * clipH / destH;
-            this.#ctx.drawImage(sprite.image, 0, 0, sprite.width, srcH, drawX, drawY, drawW, drawH);
-        }
+            
+       } else {
+    const srcH = sprite.height - sprite.height * clipH / destH;
+
+    if (sprite.flipX) {
+        this.#ctx.save();
+        this.#ctx.scale(-1, 1);
+        this.#ctx.drawImage(sprite.image, 0, 0, sprite.width, srcH,
+            -(drawX + drawW), drawY, drawW, drawH);
+        this.#ctx.restore();
+    } else {
+        this.#ctx.drawImage(sprite.image, 0, 0, sprite.width, srcH,
+            drawX, drawY, drawW, drawH);
+    }
+}
+        
     }
 
     // ── Tunnel ─────────────────────────────────────────────────

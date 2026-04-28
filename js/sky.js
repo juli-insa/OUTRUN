@@ -111,7 +111,7 @@ class Sky {
     #prevPlayerX = 0;
 
     /** How high on screen the sky occupies (0–1 of canvas height) */
-    static SKY_HEIGHT_RATIO = 0.42;
+    static SKY_HEIGHT_RATIO = 0.70;
 
     /**
      * Call once after the cloud image is loaded.
@@ -130,18 +130,18 @@ class Sky {
             scale:       0.45,
             scaleSpread: 0.15,
             alpha:       0.55,
-            count:       6,
-            parallax:    120,   // px per unit of player.x delta
+            count:       4,
+            parallax:    140,   // px per unit of player.x delta
         }, W);
 
         // Near layer — bigger, lower, faster parallax
         this.#near = new SkyLayer({
             y:           skyH * 0.65,
             ySpread:     skyH * 0.12,
-            scale:       0.75,
+            scale:       1.75,
             scaleSpread: 0.20,
             alpha:       0.85,
-            count:       4,
+            count:       2,
             parallax:    260,
         }, W);
     }

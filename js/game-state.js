@@ -8,7 +8,8 @@
  */
 
 class GameState {
-    isRunning    = true;
+    isRunning    = false;
+    isStarting   = true;
     isTimeUp     = false;
 
     // ── Score ─────────────────────────────────────────────────
@@ -19,7 +20,7 @@ class GameState {
     /** Starting seconds for each stage */
     static START_TIME = 10;
     /** Bonus seconds added when crossing a checkpoint/lap */
-    static CHECKPOINT_BONUS = 20;
+    static CHECKPOINT_BONUS = 30;
 
     #timeLeftMs  = GameState.START_TIME * 1000;
 

@@ -63,7 +63,6 @@ class Road {
      */
     #colorsForIndex(index) {
         const isDark = Math.floor(index / this.rumbleLength) % 2 === 0;
-        // Spread so each Line gets its own mutable copy
         return isDark
             ? { ...CONFIG.COLORS.DARK  }
             : { ...CONFIG.COLORS.LIGHT };
@@ -71,10 +70,16 @@ class Road {
 
     /** Apply curve values based on track position. */
     #applyCurve(line, i) {
-        if (i > 500 && i < 700)   line.curve =  7.5;
-        if (i >= 700 && i < 900)  line.curve = -0.9;
-        if (i > 1000 && i < 1360) line.curve =  1;
-        if (i >= 1360 && i < 1720) line.curve = -1;
+        if (i > 700 && i < 900)    line.curve =  -7.5; //Izquierda
+        //if (i >= 700 && i < 900)   line.curve = -0.9;
+        if (i > 1000 && i < 1360)  line.curve =  4.0;//Derecha
+        if (i >= 1360 && i < 1720) line.curve = -5.0;//Izquierda
+        if (i > 2000 && i < 2200)  line.curve = -6.5;//Izquierda
+        if (i > 2600 && i < 2800)  line.curve =  5.0;//Derecha
+        if (i > 2800 && i < 3200)  line.curve = -7.5;//Izquierda
+        if (i > 3400 && i < 3600)  line.curve =  -5.5;//Izquierda
+        if (i > 3800 && i < 3900)  line.curve =  -3.5;//Izquierda
+        if (i > 4000 && i < 4100)  line.curve = 3.5; //Derecha
     }
 
     /**
@@ -84,13 +89,22 @@ class Road {
     #applyHillAndTunnel(line, i, hillAngle, previousTunnelSegment) {
         const world = line.points.world;
 
-        if (i > 1000 && hillAngle < 360 * 2) {
+        if (i > 600 && hillAngle < 360 * 2) {
             world.y = Math.sin(hillAngle / 180 * Math.PI) * 2000;
         }
-
-        if (i > 1000 && i < 1720) {
-            previousTunnelSegment = this.#addTunnel(line, i, world.y, previousTunnelSegment);
+         if (i > 1720 && i < 2000) {
+            world.y = Math.sin(hillAngle / 180 * Math.PI) * 2000;
         }
+         if (i > 3200 && i < 3400) {
+            world.y = Math.sin(hillAngle / 180 * Math.PI) * 1500;
+        }
+            if (i > 3600 && i < 3800) { 
+            world.y = Math.sin(hillAngle / 180 * Math.PI) * 1000;
+        }
+
+       // if (i > 1000 && i < 1720) {
+        //    previousTunnelSegment = this.#addTunnel(line, i, world.y, previousTunnelSegment);
+       // }
 
         return previousTunnelSegment;
     }
@@ -99,81 +113,97 @@ class Road {
      * Attach a Tunnel object to this line segment if needed.
      * @returns {Line} updated previousTunnelSegment
      */
-    #addTunnel(line, i, worldY, previousTunnelSegment) {
-        const isFirst  = i === 1001;
-        const isRumble = i % this.rumbleLength === 0;
-        if (!isFirst && !isRumble) return previousTunnelSegment;
+  //  #addTunnel(line, i, worldY, previousTunnelSegment) {
+    //    const isFirst  = i === 2001;
+      //  const isRumble = i % this.rumbleLength === 0;
+       // if (!isFirst && !isRumble) return previousTunnelSegment;
 
-        const tunnel    = new Tunnel();
-        tunnel.worldH   = 5000 + Math.abs(worldY);
-        tunnel.leftFace.offsetX1  = 1.7;
-        tunnel.leftFace.offsetX2  = 1.3;
-        tunnel.rightFace.offsetX1 = 1.7;
-        tunnel.rightFace.offsetX2 = 1.3;
+       // const tunnel    = new Tunnel();
+      //  tunnel.worldH   = 5000 + Math.abs(worldY);
+       // tunnel.leftFace.offsetX1  = 1.7;
+       // tunnel.leftFace.offsetX2  = 1.3;
+       // tunnel.rightFace.offsetX1 = 1.7;
+       // tunnel.rightFace.offsetX2 = 1.3;
 
-        if (isFirst) {
-            tunnel.title      = "";
-            line.colors.tunnel = "#fff";
-        } else {
-            tunnel.previousSegment      = previousTunnelSegment;
-            tunnel.visibleFaces.top     = false;
-        }
+      //  if (isFirst) {
+        //    tunnel.title       = "";
+      //      line.colors.tunnel = "#fff";
+      //  } else {
+      //      tunnel.previousSegment  = previousTunnelSegment;
+     //       tunnel.visibleFaces.top = false;
+      //  }
 
-        line.tunnel = tunnel;
-        return line;
-    }
+       // line.tunnel = tunnel;
+       // return line;
+    //}
 
     /** Add decorative sprites (trees, finish line) to a segment. */
     #addSprites(line, i) {
         const rumble = this.rumbleLength;
 
         if (i % rumble === 0) {
-            const tree    = new Sprite();
-            tree.image    = resource.get("tree1");
-            tree.offsetX  = Math.floor(i / 3) % 2
-                ? (-Math.random() * 3) - 2
-                :  (Math.random() * 3) + 2;
+            const tree   = new Sprite();
+            tree.image   = resource.get("tree1");
+            tree.offsetX = Math.floor(i / 3) % 2
+            
+                tree.flipX (-Math.random() * 3) - 2
+                tree.flipX  (Math.random() * 3) + 2;
             line.sprites.push(tree);
         }
 
         if (i === 460) {
             const tree2   = new Sprite();
             tree2.image   = resource.get("tree2");
-            tree2.offsetX = -1;
+            tree2.offsetX = 1;
+            tree2.flipX        = true;   // imagen volteada
             line.sprites.push(tree2);
         }
-            //add a second same tree after the first 
         if (i === 490) {
             const tree3   = new Sprite();
             tree3.image   = resource.get("tree2");
-            tree3.offsetX = -1;
+            tree3.offsetX = 1;
+            tree3.flipX        = true;   // imagen volteada
             line.sprites.push(tree3);
-
         }
-        if (i ===520) {
+        if (i === 520) {
             const tree4   = new Sprite();
             tree4.image   = resource.get("tree2");
-            tree4.offsetX = -1;
+            tree4.offsetX = 1;
+            tree4.flipX        = true;   // imagen volteada
             line.sprites.push(tree4);
         }
         if (i === 540) {
             const tree5   = new Sprite();
             tree5.image   = resource.get("tree2");
-            tree5.offsetX = -1;
+            tree5.offsetX = 1;
+            tree5.flipX        = true;   // imagen volteada
             line.sprites.push(tree5);
         }
         if (i === 570) {
             const tree6   = new Sprite();
             tree6.image   = resource.get("tree2");
-            tree6.offsetX = -1;
+            tree6.offsetX = 1;
+            tree6.flipX        = true;   // imagen volteada
             line.sprites.push(tree6);
         }
 
+        // ── Semáforo ──────────────────────────────────────────
+        // FIX: las llaves estaban mal puestas — semaforo.offsetX y demás
+        // propiedades quedaban fuera del if, causando ReferenceError.
+        // FIX: -1,5 no es JS válido (coma en lugar de punto decimal) → -1.5
+        if (i === 18) {
+            const semaforo       = new AnimatedSprite();
+            semaforo.image       = resource.get("semaforo");
+            semaforo.offsetX     = -1.5;   // era: -1,5  ← coma inválida
+            semaforo.frameSpeed  = 0.2;
+            // line.sprites.push(semaforo); // descomentar cuando quieras activarlo
+        }
+
         if (i === 20) {
-            const finish    = new Sprite();
-            finish.image    = resource.get("finish-line");
-            finish.offsetX  = 0;
-            finish.scaleX   = 1.2;
+            const finish   = new Sprite();
+            finish.image   = resource.get("finish-line");
+            finish.offsetX = 0;
+            finish.scaleX  = 1.2;
             line.sprites.push(finish);
         }
     }
@@ -186,10 +216,10 @@ class Road {
      * @param {Player} player
      */
     render(render, camera, player) {
-        const segmentsLength  = this.segmentsLength;
-        const baseSegment     = this.getSegment(camera.cursor);
-        const startPos        = baseSegment.index;
-        const visible         = CONFIG.ROAD.VISIBLE_SEGMENTS;
+        const segmentsLength = this.segmentsLength;
+        const baseSegment    = this.getSegment(camera.cursor);
+        const startPos       = baseSegment.index;
+        const visible        = CONFIG.ROAD.VISIBLE_SEGMENTS;
         let maxY = camera.screen.height;
         let x    = 0;
         let dx   = 0;
@@ -198,9 +228,9 @@ class Road {
 
         // Forward pass – project & draw road geometry
         for (let i = startPos; i < startPos + visible; i++) {
-            const seg    = this.getSegmentFromIndex(i);
-            camera.z     = camera.cursor - (i >= segmentsLength ? this.trackLength : 0);
-            camera.x     = player.x * seg.points.world.w - x;
+            const seg = this.getSegmentFromIndex(i);
+            camera.z  = camera.cursor - (i >= segmentsLength ? this.trackLength : 0);
+            camera.x  = player.x * seg.points.world.w - x;
 
             seg.project(camera);
             x  += dx;

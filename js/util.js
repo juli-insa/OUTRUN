@@ -98,6 +98,7 @@ class Sprite {
     offsetY = 0;
     scaleX  = 1;
     scaleY  = 1;
+     flipX   = false;  
 
     get width()  { return this.image.width;  }
     get height() { return this.image.height; }

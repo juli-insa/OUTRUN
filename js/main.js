@@ -58,4 +58,5 @@ resource
     .add("finish-line", "./assets/finish.png")
     .add("tree2",       "./assets/foliagePack_013.png")
     .add("nuve",        "./assets/nuve.png")
+    .add("semaforo",     "./assets/semaforoanim.png")
     .load(() => requestAnimationFrame((t) => init(t)));

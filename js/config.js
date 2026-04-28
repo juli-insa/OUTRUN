@@ -27,7 +27,7 @@ const CONFIG = Object.freeze({
         SEGMENT_LENGTH: 200,
         RUMBLE_LENGTH:  13,
         WIDTH:          2000,
-        TOTAL_SEGMENTS: 2002,
+        TOTAL_SEGMENTS: 4602,
         /** How many segments are drawn ahead */
         VISIBLE_SEGMENTS: 500,
     },
@@ -50,14 +50,16 @@ const CONFIG = Object.freeze({
 
     // ── Timing ────────────────────────────────────────────────
     TIME: {
-        TARGET_FPS:    60,
+        TARGET_FPS:    70,
     },
 
     // ── Scenes ────────────────────────────────────────────────
     SCENES: {
         INTRO:    "intro",
         GAMEPLAY: "gameplay",
+        GAMEPLAY2: "gameplay2",
         FINISH:   "finish",
+        TOTAL_STAGES: 1,
     },
 
     // ── Finish line segment index (must match road.js) ────────
