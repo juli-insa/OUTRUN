@@ -53,8 +53,9 @@ phaserLayer.init();
 // 2. Load game image assets, then start the engine
 resource
     .add("tree1",       "./assets/foliagePack_005.png")
-    .add("car",         "./assets/car.png")
-    .add("cardobla",    "./assets/cardobla2.png")
+    .add("car",         "./assets/carnuevo.png")
+    .add("cardobla",    "./assets/cardoblanuevo.png")
+    .add("enemigo",      "./assets/car2.png")
     .add("finish-line", "./assets/finish.png")
     .add("tree2",       "./assets/foliagePack_013.png")
     .add("nuve",        "./assets/nuve.png")

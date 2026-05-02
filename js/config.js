@@ -8,8 +8,8 @@ const CONFIG = Object.freeze({
 
     // ── Canvas ────────────────────────────────────────────────
     CANVAS: {
-        WIDTH:  800,
-        HEIGHT: 600,
+        WIDTH:  320,
+        HEIGHT: 244,
     },
 
     // ── Camera / Perspective ──────────────────────────────────
@@ -34,18 +34,23 @@ const CONFIG = Object.freeze({
 
     // ── Colors ────────────────────────────────────────────────
     COLORS: {
-        DARK:  Object.freeze({ road: "#333333", grass: "#c8a84b", rumble: "red",   strip: "",      tunnel: "darkblue" }),
+        DARK:  Object.freeze({ road: "#5d5c5c", grass: "#d2b96d", rumble: "red",   strip: "",      tunnel: "darkblue" }),
         LIGHT: Object.freeze({ road: "#666666", grass: "#e2c46a", rumble: "white", strip: "white", tunnel: "blue"     }),
+    },
+    
+    COLORS2: { 
+        DARK:  Object.freeze({ road: "#5d5c5c", grass: "#716540", rumble: "red",   strip: "",      tunnel: "darkblue" }),
+        LIGHT: Object.freeze({ road: "#666666", grass: "#8a7840", rumble: "white", strip: "white", tunnel: "blue"     }),
     },
 
     // ── Player ────────────────────────────────────────────────
     PLAYER: {
         LATERAL_SPEED: 0.05,
         /** Spritesheet frame size */
-        FRAME_WIDTH:   30,
-        FRAME_HEIGHT:  35,
-        TOTAL_FRAMES:  2,
-        FRAME_SPEED:   0.15,
+        FRAME_WIDTH:   45,
+        FRAME_HEIGHT:  60,
+        TOTAL_FRAMES:  3,
+        FRAME_SPEED:   0.30,
     },
 
     // ── Timing ────────────────────────────────────────────────

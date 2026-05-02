@@ -15,6 +15,8 @@ class SceneManager {
     #player   = null;
     #road     = null;
     #state    = null;
+        #npcCars   = [];
+
 
     /** @type {IntroScene}    */ #intro    = null;
     /** @type {GameplayScene} */ #gameplay = null;
@@ -37,6 +39,8 @@ class SceneManager {
         this.#road     = road;
         this.#state    = state;
         this.#sky      = sky;
+        const npcImage = resource.get("enemigo");
+        this.#npcCars  = NpcCar.createFleet(road, npcImage);
 
         this.#intro    = new IntroScene(this);
         this.#gameplay = new GameplayScene(this);
@@ -54,6 +58,7 @@ class SceneManager {
     get road()     { return this.#road;     }
     get state()    { return this.#state;    }
     get sky()      { return this.#sky;      }
+    get npcCars()  { return this.#npcCars;  }
     get current()  { return this.#current;  }
 
     /**

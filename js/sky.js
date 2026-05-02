@@ -83,7 +83,7 @@ class SkyLayer {
             const h = img.height * cloud.scale;
 
             // Wrap offset so clouds cycle seamlessly
-            let drawX = ((cloud.x + this.offsetX) % W + W * 1.5) % (W * 2) - W * 0.5;
+            let drawX = ((cloud.x + this.offsetX) % W + W * 0.5) % (W * 2) - W * 0.5;
 
             ctx.globalAlpha = cloud.alpha;
             ctx.drawImage(img, drawX - w * 0.5, cloud.y - h * 0.5, w, h);

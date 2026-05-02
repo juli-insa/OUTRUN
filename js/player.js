@@ -44,7 +44,7 @@ class Player {
      */
     update(speed = 0) {
         const gp    = phaserLayer.gamepad;
-        const axisX = gp.axes().lx;
+       const axisX = gp.axes().lx?.value ?? gp.axes().lx ?? 0;
 
         const left  = keyboard.isKeyDown("arrowleft")
                    || gp.isDown(GamepadButtons.LEFT)

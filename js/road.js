@@ -144,10 +144,10 @@ class Road {
         if (i % rumble === 0) {
             const tree   = new Sprite();
             tree.image   = resource.get("tree1");
-            tree.offsetX = Math.floor(i / 3) % 2
+            tree.offsetX = Math.floor(i / 1) % 2
             
-                tree.flipX (-Math.random() * 3) - 2
-                tree.flipX  (Math.random() * 3) + 2;
+                ? (-Math.random() * 1) - 1.4
+                :  (Math.random() * 1) + 1.4;
             line.sprites.push(tree);
         }
 
