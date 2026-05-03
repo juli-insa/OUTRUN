@@ -113,6 +113,8 @@ class Sky {
     /** How high on screen the sky occupies (0–1 of canvas height) */
     static SKY_HEIGHT_RATIO = 0.70;
 
+    #stage = 1;
+
     /**
      * Call once after the cloud image is loaded.
      * @param {HTMLImageElement} cloudImage
@@ -146,6 +148,10 @@ class Sky {
         }, W);
     }
 
+    setStage(stage) {
+        this.#stage = stage;
+    }
+
     /**
      * Call every frame with the current player.x.
      * @param {number} playerX
@@ -171,9 +177,15 @@ class Sky {
 
         // Sky gradient background
         const grad = ctx.createLinearGradient(0, 0, 0, skyH);
-        grad.addColorStop(0,   "#5ab4f5");
-        grad.addColorStop(0.6, "#a8d8f5");
-        grad.addColorStop(1,   "#c8eaff");
+        if (this.#stage === 1) {
+            grad.addColorStop(0,   "#5ab4f5");
+            grad.addColorStop(0.6, "#a8d8f5");
+            grad.addColorStop(1,   "#c8eaff");
+        } else if (this.#stage === 2) {
+            grad.addColorStop(0,   "#ffab5a");
+            grad.addColorStop(0.6, "#ffd8a8");
+            grad.addColorStop(1,   "#ffeac8");
+        }
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, skyH);
 

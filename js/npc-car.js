@@ -36,6 +36,7 @@ class NpcCar {
 
         this.sprite       = new Sprite();
         this.sprite.image = image;
+        this.sprite.collidable = false;  // colisión manejada manualmente
     }
 
     /**
@@ -69,17 +70,22 @@ class NpcCar {
     }
 
     /**
-     * Colisión con el jugador: si están en el mismo segmento y cerca
-     * lateralmente, frena al jugador.
+     * Colisión con el jugador.
+     * Si está en el mismo segmento y cerca lateralmente → stun + frenón.
+     * Si el jugador ya está stunned, se ignora (invencibilidad).
      */
     checkCollision(player, camera, road, camSegIndex) {
+        // Invencibilidad durante el stun
+        if (player.isStunned) return;
+ 
         const totalSegs = road.segmentsLength;
         let diff = Math.abs(this.segmentIndex - camSegIndex);
         if (diff > totalSegs / 2) diff = totalSegs - diff;
         if (diff > 4) return;
-
+ 
         if (Math.abs(player.x - this.x) < 0.22) {
-            camera.acceleration *= 0.45;
+            player.stun();
+            camera.acceleration *= 0.3;
         }
     }
 

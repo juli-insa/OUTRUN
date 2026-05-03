@@ -20,7 +20,6 @@ class SceneManager {
 
     /** @type {IntroScene}    */ #intro    = null;
     /** @type {GameplayScene} */ #gameplay = null;
-    /** @type {GameplayScene2} */ #gameplay2 = null;
     /** @type {FinishScene}   */ #finish   = null;
     /** @type {Sky}           */ #sky      = null;
 
@@ -44,7 +43,6 @@ class SceneManager {
 
         this.#intro    = new IntroScene(this);
         this.#gameplay = new GameplayScene(this);
-        this.#gameplay2 = new GameplayScene2(this);
         this.#finish   = new FinishScene(this);
 
         this.#intro.enter();
@@ -82,7 +80,6 @@ class SceneManager {
         switch (this.#current) {
             case CONFIG.SCENES.INTRO:    return this.#intro;
             case CONFIG.SCENES.GAMEPLAY: return this.#gameplay;
-            case CONFIG.SCENES.GAMEPLAY2: return this.#gameplay2;
             case CONFIG.SCENES.FINISH:   return this.#finish;
         }
     }

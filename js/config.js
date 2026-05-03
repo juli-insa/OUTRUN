@@ -62,9 +62,8 @@ const CONFIG = Object.freeze({
     SCENES: {
         INTRO:    "intro",
         GAMEPLAY: "gameplay",
-        GAMEPLAY2: "gameplay2",
         FINISH:   "finish",
-        TOTAL_STAGES: 1,
+        TOTAL_STAGES: 2,
     },
 
     // ── Finish line segment index (must match road.js) ────────

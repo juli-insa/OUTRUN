@@ -31,18 +31,21 @@ class IntroScene {
         const camera = this.#mgr.camera;
         camera.cursor       = road.segmentLength * 60;
         camera.acceleration = 0;
+        
 
         // ── Audio ──────────────────────────────────────────────
         phaserLayer.audio.playMusic("music-intro");
 
         // ── Keyboard / gamepad listener ────────────────────────
         this._onKey = (e) => {
-            if ((e.key === "Enter" || e.key === " ") && this.#carAnimDone) {
+            if ((e.key === "Enter" || e.key === "") && this.#carAnimDone) {
                 this._startGame();
             }
+           
         };
         window.addEventListener("keydown", this._onKey);
     }
+        
 
     exit() {
         window.removeEventListener("keydown", this._onKey);
@@ -57,8 +60,12 @@ class IntroScene {
         const H = CANVAS.height;
         const ctx = render.renderingContext;
 
-        // Gamepad START button also starts the game
-        if (this.#carAnimDone && phaserLayer.gamepad.isDown(GamepadButtons.START)) {
+        // Gamepad START button, A button, or stick movement starts the game
+        const gp = phaserLayer.gamepad;
+        const stickPressed = Math.abs(gp.axes().lx ?? 0) > 0.5 || Math.abs(gp.axes().ly ?? 0) > 0.5 
+                          || Math.abs(gp.axes().rx ?? 0) > 0.5 || Math.abs(gp.axes().ry ?? 0) > 0.5;
+        
+        if (this.#carAnimDone && (gp.isDown(GamepadButtons.START) || gp.isDown(GamepadButtons.A) || stickPressed)) {
             this._startGame();
             return;
         }
@@ -123,7 +130,7 @@ class IntroScene {
                 ctx.textBaseline = "middle";
                 ctx.fillStyle    = "#ffffff";
                 ctx.font         = "bold 22px monospace";
-                ctx.fillText("[ ENTER ] para jugar", W / 2, H * 0.42);
+                ctx.fillText("[ ENTER ] to START", W / 2, H * 0.42);
                 ctx.restore();
             }
         }

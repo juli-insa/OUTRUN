@@ -1,8 +1,8 @@
 /**
  * @file player.js
- * The player-controlled car.
- * Accepts keyboard AND gamepad input for lateral movement.
- * In curves, the car drifts outward if the player doesn't steer to compensate.
+ * El auto del jugador.
+ * stun() recibe deltaMs desde la escena directamente — sin depender
+ * de timeObject que puede dar valores incorrectos el primer frame.
  */
 
 class Player {
@@ -16,19 +16,26 @@ class Player {
     isCardobla   = false;
     isMovingLeft = false;
 
-    /**
-     * Current curve value — set each frame by GameplayScene
-     * from the active road segment.
-     * Positive = right curve, negative = left curve.
-     * @type {number}
-     */
     currentCurve = 0;
 
-    /**
-     * How strongly the curve pushes the car off-lane.
-     * Tune this to make curves feel harder or easier.
-     * OutRun feel: 0.00012 – 0.00020
-     */
+    // ── Stun ──────────────────────────────────────────────────
+    static STUN_DURATION  = 2000;  // ms
+    static BLINK_INTERVAL = 120;   // ms
+
+    #stunTimer  = 0;
+    #blinkTimer = 0;
+    #blinkOn    = true;
+    #resetPositionAfterStun = false;
+
+    get isStunned() { return this.#stunTimer > 0; }
+
+    stun() {
+        this.#stunTimer  = Player.STUN_DURATION;
+        this.#blinkTimer = 0;
+        this.#blinkOn    = false;   // empieza invisible para feedback inmediato
+        this.#resetPositionAfterStun = false;  // reset la bandera cuando comienza nuevo stun
+    }
+
     static DRIFT_FACTOR = 0.00015 - 0.00020;
 
     get currentSprite() {
@@ -39,12 +46,34 @@ class Player {
     get height() { return this.currentSprite.height; }
 
     /**
-     * Called every frame to read input, apply drift and update position.
-     * @param {number} speed  current speed 0-255 (from GameState)
+     * @param {number} speed    velocidad 0-255
+     * @param {number} deltaMs  ms del frame actual — pasado desde la escena
      */
-    update(speed = 0) {
+    update(speed = 0, deltaMs = 16) {
+        // ── Tick del stun ──────────────────────────────────────
+        if (this.#stunTimer > 0) {
+            this.#stunTimer  -= deltaMs;
+            this.#blinkTimer += deltaMs;
+            if (this.#blinkTimer >= Player.BLINK_INTERVAL) {
+                this.#blinkTimer -= Player.BLINK_INTERVAL;
+                this.#blinkOn     = !this.#blinkOn;
+            }
+            this.isCardobla   = false;
+            this.isMovingLeft = false;
+            return;
+        }
+
+        // El stun terminó — reubica el auto al centro SOLO UNA VEZ
+        if (!this.#resetPositionAfterStun) {
+            this.x = 0;
+            this.#resetPositionAfterStun = true;
+        }
+        
+        this.#blinkOn = true;
+
+        // ── Input ─────────────────────────────────────────────
         const gp    = phaserLayer.gamepad;
-       const axisX = gp.axes().lx?.value ?? gp.axes().lx ?? 0;
+        const axisX = gp.axes().lx?.value ?? gp.axes().lx ?? 0;
 
         const left  = keyboard.isKeyDown("arrowleft")
                    || gp.isDown(GamepadButtons.LEFT)
@@ -57,7 +86,6 @@ class Player {
         this.isCardobla   = left || right;
         this.isMovingLeft = left;
 
-        // ── Lateral steering ───────────────────────────────────
         const lateralSpeed = Math.abs(axisX) > 0.3
             ? CONFIG.PLAYER.LATERAL_SPEED * Math.abs(axisX)
             : CONFIG.PLAYER.LATERAL_SPEED;
@@ -65,42 +93,33 @@ class Player {
         if (left)       this.x -= lateralSpeed;
         else if (right) this.x += lateralSpeed;
 
-        // ── Curve drift ────────────────────────────────────────
-        // The faster you go and the sharper the curve,
-        // the more the car drifts outward (same sign as curve).
-        const drift = this.currentCurve * speed * Player.DRIFT_FACTOR;
-        this.x += drift;
+        this.x += this.currentCurve * speed * Player.DRIFT_FACTOR;
     }
 
-    /**
-     * Draw the player car at the bottom-centre of the screen.
-     * @param {Render} render
-     * @param {Camera} camera
-     * @param {number} roadWidth
-     */
-   render(render, camera, roadWidth) {
-    const mid    = camera.screen.midpoint;
-    const scale  = 1 / camera.h;
-    const destX  = mid.x;
-    const destY  = camera.screen.height;
-    const ctx    = render.renderingContext;
-    const sprite = this.currentSprite;
+    render(render, camera, roadWidth) {
+        if (!this.#blinkOn) return;
 
-    if (this.isCardobla && this.isMovingLeft) {
-        const FACTOR = 1 / 3;
-        const sw    = sprite.width  || 64;
-        const sh    = sprite.height || 64;
-        const destW = (sw * scale * mid.x) * (roadWidth * sprite.scaleX / (sw || 64)) * FACTOR;
-        const cx    = Math.round(destX - destW * 0.5) + destW * 0.5;
+        const mid    = camera.screen.midpoint;
+        const scale  = 1 / camera.h;
+        const destX  = mid.x;
+        const destY  = camera.screen.height;
+        const ctx    = render.renderingContext;
+        const sprite = this.currentSprite;
 
-        ctx.save();
-        ctx.translate(cx, 0);
-        ctx.scale(-1, 1);
-        ctx.translate(-cx, 0);
-        render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0);
-        ctx.restore();
-    } else {
-        render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0);
+        if (this.isCardobla && this.isMovingLeft) {
+            const FACTOR = 1 / 3;
+            const sw    = sprite.width  || 64;
+            const destW = (sw * scale * mid.x) * (roadWidth * sprite.scaleX / (sw || 64)) * FACTOR;
+            const cx    = Math.round(destX - destW * 0.5) + destW * 0.5;
+
+            ctx.save();
+            ctx.translate(cx, 0);
+            ctx.scale(-1, 1);
+            ctx.translate(-cx, 0);
+            render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0);
+            ctx.restore();
+        } else {
+            render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0);
+        }
     }
-}
 }

@@ -1,9 +1,11 @@
 /**
  * @file scene-gameplay.js
- * GAMEPLAY scene — Stage 1. NPCs integrados.
+ * GAMEPLAY scene — Stage 1.
+ * La colisión se detecta ANTES de camera.update() para que el
+ * frenado y el parpadeo sean instantáneos.
  */
 
-const TOTAL_LAPS = 1;
+const TOTAL_LAPS = 2;
 
 const HUD = Object.freeze({
     BAR_H:        80,
@@ -27,6 +29,7 @@ class GameplayScene {
 
     #prevSegmentIndex = 1;
     #FINISH_INDEX     = CONFIG.FINISH_LINE_INDEX;
+    #stage            = 1;
     #lap              = 0;
     #crossingCooldown = false;
     #prevSpeed        = 0;
@@ -34,8 +37,14 @@ class GameplayScene {
     constructor(mgr) { this.#mgr = mgr; }
 
     enter() {
+        this.#startStage(1);
+    }
+
+    #startStage(stage) {
         const { camera, road, state } = this.#mgr;
-        state.reset();
+        if (stage === 1) state.reset();
+
+        this.#stage            = stage;
         camera.cursor          = -road.segmentLength * road.rumbleLength;
         camera.acceleration    = 0;
         this.#mgr.player.x     = 0;
@@ -43,6 +52,10 @@ class GameplayScene {
         this.#lap              = 0;
         this.#crossingCooldown = false;
         this.#prevSpeed        = 0;
+
+        road.clear();
+        road.create(CONFIG.ROAD.TOTAL_SEGMENTS, stage);
+        this.#mgr.sky.setStage(stage);
         phaserLayer.audio.playMusic("music-gameplay");
     }
 
@@ -57,23 +70,46 @@ class GameplayScene {
 
         const speed = Math.round((camera.acceleration / CONFIG.CAMERA.MAX_ACCELERATION) * 255);
         state.update(deltaMs, speed);
-        camera.update(road);
 
+        // ── 1. Segmento actual (antes de mover nada) ───────────
         const activeSegment = road.getSegment(camera.cursor);
+        const camSegIndex   = activeSegment?.index ?? -1;
+
+        // ── 2. Colisión con árboles — ANTES de camera.update ──
+        if (!player.isStunned) {
+            if (road.checkSpriteCollision(player, camSegIndex)) {
+                player.stun();
+                camera.acceleration = 0;   // freno inmediato
+            }
+        }
+
+        // ── 3. Colisión con NPCs — también antes de mover ──────
+        for (const npc of npcCars) {
+            npc.update(road, camera.acceleration);
+            if (!player.isStunned) {
+                npc.checkCollision(player, camera, road, camSegIndex);
+            }
+            npc.attach(road);
+        }
+
+        // ── 4. Cámara: si está stunned, frenar; si no, input normal
+        if (player.isStunned) {
+            camera.acceleration *= 0.80;
+            if (camera.acceleration < 0) camera.acceleration = 0;
+            // Avance mínimo para que la escena no se congele visualmente
+            camera.cursor += road.segmentLength * 0.2;
+            if (camera.cursor >= road.trackLength) camera.cursor -= road.trackLength;
+        } else {
+            camera.update(road);
+        }
+
+        // ── 5. Player update (drift + input) ──────────────────
         player.currentCurve = activeSegment ? activeSegment.curve : 0;
         player.update(speed);
 
-        // ── NPCs ──────────────────────────────────────────────
-        const camSegIndex = activeSegment?.index ?? -1;
-        for (const npc of npcCars) {
-            npc.update(road, camera.acceleration);           // avanzar
-            npc.checkCollision(player, camera, road, camSegIndex);
-            npc.attach(road);                                // adjuntar al segmento
-        }
-
-        // ── Detección línea de llegada ─────────────────────────
+        // ── 6. Finish-line / lap ───────────────────────────────
         const currentIndex = camSegIndex;
-        const crossingNow  = this.#prevSegmentIndex > 100
+        const crossingNow  = this.#prevSegmentIndex > 50
                           && currentIndex <= this.#FINISH_INDEX + road.rumbleLength;
 
         if (crossingNow && !this.#crossingCooldown) {
@@ -84,13 +120,19 @@ class GameplayScene {
             phaserLayer.particles.burst(W / 2, 0, 40);
 
             if (this.#lap >= TOTAL_LAPS) {
+                if (this.#stage === 1) {
+                    for (const npc of npcCars) npc.detach();
+                    this.#startStage(2);
+                    return;
+                }
+
                 for (const npc of npcCars) npc.detach();
-                this.#mgr.transitionTo(CONFIG.SCENES.GAMEPLAY2);
+                this.#mgr.transitionTo(CONFIG.SCENES.FINISH);
                 return;
             }
         }
 
-        if (this.#crossingCooldown && currentIndex > this.#FINISH_INDEX + road.rumbleLength + 5) {
+        if (this.#crossingCooldown && currentIndex > this.#FINISH_INDEX + road.rumbleLength + 1) {
             this.#crossingCooldown = false;
         }
 
@@ -103,18 +145,16 @@ class GameplayScene {
             return;
         }
 
-        // ── Render ────────────────────────────────────────────
+        // ── 7. Render ─────────────────────────────────────────
         render.clear(0, 0, W, H);
         render.save();
-        const sky = this.#mgr.sky;
-        sky.update(player.x);
-        sky.render(render.renderingContext);
-        road.render(render, camera, player);   // NPCs se dibujan aquí
+        this.#mgr.sky.update(player.x);
+        this.#mgr.sky.render(render.renderingContext);
+        road.render(render, camera, player);
         player.render(render, camera, road.width);
         this.#drawHUD(render.renderingContext, W, H, state);
         render.restore();
 
-        // Desadjuntar DESPUÉS de renderizar
         for (const npc of npcCars) npc.detach();
 
         this.#prevSpeed = speed;
@@ -136,7 +176,7 @@ class GameplayScene {
         ctx.fillStyle    = "#eb3737";
         ctx.textAlign    = "right";
         ctx.textBaseline = "top";
-        ctx.fillText(`STAGE 1/${CONFIG.SCENES.TOTAL_STAGES}`, W - HUD.PAD_X, barY + 20);
+        ctx.fillText(`STAGE ${this.#stage}/${CONFIG.SCENES.TOTAL_STAGES}`, W - HUD.PAD_X, barY + 20);
 
         const timeLeft   = state.timeLeft;
         const isLow      = timeLeft <= 10;
@@ -155,17 +195,17 @@ class GameplayScene {
     }
 
     #label(ctx, text, x, y, align = "left") {
-        ctx.font         = `bold ${HUD.LABEL_SIZE}px ${HUD.FONT}`;
-        ctx.fillStyle    = HUD.LABEL_COLOR;
-        ctx.textAlign    = align;
+        ctx.font = `bold ${HUD.LABEL_SIZE}px ${HUD.FONT}`;
+        ctx.fillStyle = HUD.LABEL_COLOR;
+        ctx.textAlign = align;
         ctx.textBaseline = "top";
         ctx.fillText(text, x, y);
     }
 
     #value(ctx, text, x, y, color, size, align = "left") {
-        ctx.font         = `bold ${size}px ${HUD.FONT}`;
-        ctx.fillStyle    = color;
-        ctx.textAlign    = align;
+        ctx.font = `bold ${size}px ${HUD.FONT}`;
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
         ctx.textBaseline = "top";
         ctx.fillText(text, x, y);
     }
