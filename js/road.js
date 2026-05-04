@@ -56,7 +56,7 @@ class Road {
         }
 
         for (let j = 0; j < rumble; j++) {
-            this.#segments[j].colors.road = "#333";
+            this.#segments[j].colors.road = "#424242";
         }
     }
     
@@ -76,41 +76,69 @@ class Road {
             if (i >= 1360 && i < 1720) line.curve = -5.0;
             if (i > 2000 && i < 2200)  line.curve = -6.5;
             if (i > 2600 && i < 2800)  line.curve =  5.0;
-            if (i > 2800 && i < 3200)  line.curve = -7.5;
+            if (i > 2800 && i < 3200)  line.curve = -6.5;
             if (i > 3400 && i < 3600)  line.curve = -5.5;
             if (i > 3800 && i < 3900)  line.curve = -3.5;
             if (i > 4000 && i < 4100)  line.curve =  3.5;
+            
         } else if (stage === 2) {
             // Curvas diferentes para stage 2
-            if (i > 600  && i < 800)   line.curve =  6.0;
-            if (i > 900  && i < 1200)  line.curve = -5.0;
-            if (i > 1300 && i < 1600)  line.curve =  4.5;
-            if (i > 1800 && i < 2000)  line.curve = -7.0;
+            if (i > 600  && i < 800)   line.curve =  5.0;
+            if (i > 800  && i < 900)   line.curve = 1.0;
+            //if (i > 900  && i < 1200)  line.curve = 5.0;
+            if (i > 1300 && i < 1800)  line.curve =  -6.5;
+            if (i > 1800 && i < 2000)  line.curve = -4.0;
             if (i > 2200 && i < 2400)  line.curve =  5.5;
             if (i > 2600 && i < 2900)  line.curve = -6.0;
             if (i > 3100 && i < 3300)  line.curve =  4.0;
-            if (i > 3500 && i < 3700)  line.curve = -5.5;
+            if (i > 3500 && i < 3700)  line.curve = 5.5;
             if (i > 3900 && i < 4100)  line.curve =  3.0;
         }
     }
 
-    #applyHillAndTunnel(line, i, hillAngle, previousTunnelSegment) {
+    #applyHillAndTunnel(line, i, hillAngle) {
         const world = line.points.world;
-        if (i > 600  && hillAngle < 360 * 2)  world.y = Math.sin(hillAngle / 180 * Math.PI) * 2000;
-        if (i > 1720 && i < 2000)             world.y = Math.sin(hillAngle / 180 * Math.PI) * 2000;
-        if (i > 3200 && i < 3400)             world.y = Math.sin(hillAngle / 180 * Math.PI) * 1500;
-        if (i > 3600 && i < 3800)             world.y = Math.sin(hillAngle / 180 * Math.PI) * 1000;
-        return previousTunnelSegment;
+        
+        // Primera colina: 600-1720
+        if (i > 300 && i < 720)             
+             world.y = Math.sin(hillAngle / 180 * Math.PI) * 2000;
+
+        if (i > 400 && i < 720) {
+            const localHill = ((i - 400) / (720 - 400)) * 360;
+            world.y = Math.sin(localHill / 180 * Math.PI) * 2000;
+        }
+        
+        // Segunda colina: 1720-2000
+        if (i > 1720 && i < 2000) {
+            const localHill = ((i - 1720) / (2000 - 1720)) * 360;
+            world.y = Math.sin(localHill / 180 * Math.PI) * 2000;
+        }
+        
+        // Tercera colina: 3200-3400
+        if (i > 3200 && i < 3400) {
+            const localHill = ((i - 3200) / (3400 - 3200)) * 360;
+            world.y = Math.sin(localHill / 180 * Math.PI) * 1500;
+        }
+        
+        // Cuarta colina: 3800-4100
+        if (i > 3800 && i < 4100) {
+            const localHill = ((i - 3800) / (4100 - 3800)) * 360;
+            world.y = Math.sin(localHill / 180 * Math.PI) * 2000;
+        }
+        
+        return line.tunnel;
     }
 
     #addSprites(line, i, stage = 1) {
         const rumble = this.rumbleLength;
 
+        
+
         if (i % rumble === 0) {
             const tree      = new Sprite();
-            tree.image      = stage === 2 ? resource.get("tree2") : resource.get("tree1");
-            tree.scaleY = 2 + Math.random() * 0.4;
-            tree.scaleX = 2 + Math.random() * 0.4;
+            tree.image      = stage === 2 ? resource.get("tree3") : resource.get("tree1");
+            tree.scaleY = 2 + Math.random() * 0.1;
+            tree.scaleX = 2 + Math.random() * 0.1;
             tree.collidable = true;
             // offsetX negativo = izquierda, positivo = derecha
             // Valores ≥ 1.4 están fuera de la calzada (borde empieza en 1.0)
@@ -126,16 +154,33 @@ class Road {
         }
 
         // Árboles grandes — quedarlos FUERA de la calzada
-        const bigTreeSegs = [460, 490, 520, 540, 570];
+        const bigTreeSegs = 
+           [580, 610, 640, 670, 700, 730, 760, 790, 820, 850, 880, 
+            910, 940, 970, 990, 1020, 1050, 1080, 1110, 1140, 1170, 1200, 1230, 1260,
+            1290, 1320, 1350, 1380, 1410, 1440, 1470, 1500, 1530, 1560, 1590,
+            1610, 1640, 1670, 1700, 1990, 2020, 2050, 2080, 2110, 2140,
+            2170, 2200,2570, 2600, 2630, 2600, 2690, 2720, 2750, 2780,
+            2810, 2840, 2870, 2900, 2930, 2960, 2990, 3020, 3050, 3080, 3110, 3140, 3170, 3370, 3400, 3430, 3460, 
+            3490, 3520, 3550, 3580, 3770, 3800, 3820, 3850, 3870, 3970,
+            4000, 4020, 4050, 4070];
         if (bigTreeSegs.includes(i)) {
             const tree      = new Sprite();
-            tree.image      = stage === 2 ? resource.get("tree1") : resource.get("tree2");
+            tree.image      = stage === 2 ? resource.get("tree2") : resource.get("tree2");
+            tree.scaleY = 2 + Math.random() * 0.5;
+            tree.scaleX = 2 + Math.random() * 0.5;
+            tree.collidable = true;
             tree.offsetX    = 1.5;   // era 1.0 → estaba dentro de calzada
             tree.flipX      = true;
             tree.collidable = true;
-            tree.roadSide   = 1;     // lado derecho
+            tree.roadSide   = 1;  
+            if (line.curve > 0) {
+                tree.flipX = false; 
+                tree.offsetX = - 1.5;  // voltear horizontalmente los árboles del lado derecho
+            }
             line.sprites.push(tree);
         }
+
+        
 
         if (i === 18) {
             const semaforo      = new AnimatedSprite();

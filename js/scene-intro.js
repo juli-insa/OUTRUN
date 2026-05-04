@@ -102,18 +102,18 @@ class IntroScene {
         ctx.textBaseline = "middle";
 
         ctx.fillStyle = "rgba(0,0,0,0.6)";
-        ctx.font      = "bold 72px monospace";
-        ctx.fillText("OUT RUN", W / 2 + 4, H * 0.18 + 4);
+        ctx.font      = "bold 72px 'Press Start 2P', monospace";
+        ctx.fillText("Out Run", W / 2 + 4, H * 0.18 + 4);
 
         const grad = ctx.createLinearGradient(0, H * 0.12, 0, H * 0.25);
         grad.addColorStop(0, "#ff4dd3");
         grad.addColorStop(1, "#ff0000");
         ctx.fillStyle = grad;
-        ctx.font      = "bold 72px monospace";
-        ctx.fillText("OUT RUN", W / 2, H * 0.18);
+        ctx.font      = "bold 72px 'Press Start 2P', monospace";
+        ctx.fillText("Out Run", W / 2, H * 0.18);
 
         ctx.fillStyle = "#ffffff";
-        ctx.font      = "20px monospace";
+        ctx.font      = "16px 'Press Start 2P', monospace";
         ctx.fillText("REMAKE by JULIETA INSAURRALDE", W / 2, H * 0.30);
         ctx.restore();
 
@@ -128,9 +128,20 @@ class IntroScene {
                 ctx.save();
                 ctx.textAlign    = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillStyle    = "#ffffff";
-                ctx.font         = "bold 22px monospace";
-                ctx.fillText("[ ENTER ] to START", W / 2, H * 0.42);
+                ctx.fillStyle    = "#010300";
+               
+                ctx.font      = "bold 20px 'Press Start 2P', monospace";
+                ctx.fillStyle = "rgba(0, 255, 136, 0.8)";
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 2;
+                ctx.fillText("PRESS [ A ] TO START", W / 2, H * 0.42);
+                ctx.strokeText("PRESS [ A ] TO START", W / 2, H * 0.42);
+                // BORDE NEGRO
+                 ctx.bold = "bold 20px 'Press Start 2P', monospace";
+                ctx.fillText("PRESS [ A ] TO START", W / 2 + 2, H * 0.42 + 2);
+              //  ctx.fillStyle = "#ffffff";
+                //ctx.font         = "bold 22px monospace";
+               // ctx.fillText("[ ENTER ] to START", W / 2, H * 0.42);
                 ctx.restore();
             }
         }

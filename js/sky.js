@@ -62,12 +62,20 @@ class SkyLayer {
     }
 
     /**
-     * @param {number} playerX   player.x value (-∞ to +∞, but typically -1..1)
-     * @param {number} prevX     player.x last frame
+    
+     * @param {number} curve     road segment curve (-∞ to +∞, negative = left, positive = right)
      */
-    update(playerX, prevX) {
-        const delta  = playerX - prevX;          // how much the player moved laterally
-        this.offsetX -= delta * this.parallax;   // move clouds opposite to steer direction
+    update( curve) {
+       // const playerDelta = playerX - prevX;
+
+        // Clouds move opposite to player steering.
+        // When the player moves right, clouds move left; when left, clouds move right.
+        //this.offsetX -= playerDelta * this.parallax;
+
+        // Clouds also move opposite to the road curve direction.
+        // A left curve (negative) shifts clouds right, a right curve (positive) shifts them left.
+        this.offsetX -= curve * this.parallax * 0.005;
+        
     }
 
     /**
@@ -107,8 +115,10 @@ class Sky {
     #far     = null;
     /** @type {SkyLayer} */
     #near    = null;
+    /** @type {SkyLayer} */
+    #bushes  = null;
 
-    #prevPlayerX = 0;
+   // #prevPlayerX = 0;
 
     /** How high on screen the sky occupies (0–1 of canvas height) */
     static SKY_HEIGHT_RATIO = 0.70;
@@ -132,8 +142,8 @@ class Sky {
             scale:       0.45,
             scaleSpread: 0.15,
             alpha:       0.55,
-            count:       4,
-            parallax:    140,   // px per unit of player.x delta
+            count:       2,
+            parallax:    100,   // px per unit of player.x delta
         }, W);
 
         // Near layer — bigger, lower, faster parallax
@@ -143,24 +153,38 @@ class Sky {
             scale:       1.75,
             scaleSpread: 0.20,
             alpha:       0.85,
-            count:       2,
-            parallax:    260,
+            count:       1,
+            parallax:    200,
         }, W);
-    }
 
+        // Bushes layer — on the horizon, medium parallax
+        this.#bushes = new SkyLayer({
+            y:           skyH * 0.70,
+            ySpread:     skyH * 0.05,
+            scale:       2,
+            scaleSpread: 0.1,
+            alpha:       0.7,
+            count:       4,
+            parallax:    150,
+        }, W);
+    }     
     setStage(stage) {
         this.#stage = stage;
     }
 
     /**
-     * Call every frame with the current player.x.
+     * Call every frame with the current player.x and road curve.
      * @param {number} playerX
+     * @param {number} curve
      */
-    update(playerX) {
+    update( curve) {
         if (!this.#far) return;
-        this.#far.update(playerX,  this.#prevPlayerX);
-        this.#near.update(playerX, this.#prevPlayerX);
-        this.#prevPlayerX = playerX;
+        this.#far.update( curve);
+        this.#near.update( curve);
+        if (this.#stage === 1 && this.#bushes) {
+            this.#bushes.update( curve);
+        }
+       // this.#prevPlayerX = playerX;
     }
 
     /**
@@ -178,13 +202,13 @@ class Sky {
         // Sky gradient background
         const grad = ctx.createLinearGradient(0, 0, 0, skyH);
         if (this.#stage === 1) {
-            grad.addColorStop(0,   "#5ab4f5");
-            grad.addColorStop(0.6, "#a8d8f5");
-            grad.addColorStop(1,   "#c8eaff");
+            grad.addColorStop(0,   "#33a4f5");
+            grad.addColorStop(0.6, "#5fbcf6");
+            grad.addColorStop(1,   "#77c6f8");
         } else if (this.#stage === 2) {
-            grad.addColorStop(0,   "#ffab5a");
-            grad.addColorStop(0.6, "#ffd8a8");
-            grad.addColorStop(1,   "#ffeac8");
+            grad.addColorStop(0,   "#995aff");
+            grad.addColorStop(0.6, "#d1a8ff");
+            grad.addColorStop(1,   "#f3c8ff");
         }
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, skyH);
@@ -192,5 +216,8 @@ class Sky {
         // Clouds — far first (painter's order)
         this.#far.render(ctx,  this.#img);
         this.#near.render(ctx, this.#img);
+        if (this.#stage === 1 && this.#bushes) {
+            this.#bushes.render(ctx, resource.get("arbusto"));
+        }
     }
 }

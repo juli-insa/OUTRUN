@@ -8,7 +8,7 @@
 class FinishScene {
     /** @type {SceneManager} */ #mgr;
 
-    #DISPLAY_DURATION = 6000;
+    #DISPLAY_DURATION = 10000;
     #timer            = 0;
     #carOscillation   = 0;
     #SCROLL_SPEED     = 0.2;
@@ -123,17 +123,17 @@ class FinishScene {
         ctx.textBaseline = "middle";
 
         // Title
-        ctx.font      = "bold 26px monospace";
+        ctx.font      = "bold 26px 'Press Start 2P', monospace";
         ctx.fillStyle = this.#timeUp ? "#ff4400" : "#ffff00";
         ctx.fillText(this.#timeUp ? "⏱  TIME UP!" : "🏆  GOAL!", midX, cardY + 35);
 
         // Score columns
-        ctx.font      = "bold 14px monospace";
+        ctx.font      = "bold 14px 'Press Start 2P', monospace";
         ctx.fillStyle = "#ffffff";
         ctx.fillText("SCORE",    midX - 70, cardY + 72);
         ctx.fillText("HI-SCORE", midX + 70, cardY + 72);
 
-        ctx.font      = "bold 26px monospace";
+        ctx.font      = "bold 16px 'Press Start 2P', monospace";
         ctx.fillStyle = "#ffff00";
         ctx.fillText(this.#finalScore, midX - 70, cardY + 98);
         ctx.fillStyle = "#ff6600";
@@ -141,7 +141,7 @@ class FinishScene {
 
         // Countdown
         const remaining = Math.ceil((this.#DISPLAY_DURATION - this.#timer) / 1000);
-        ctx.font      = "13px monospace";
+        ctx.font      = "13px 'Press Start 2P', monospace";
         ctx.fillStyle = "rgba(255,255,255,0.55)";
         ctx.fillText(`Volviendo al menú en ${remaining}…`, midX, cardY + 148);
 

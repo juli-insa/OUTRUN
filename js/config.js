@@ -34,13 +34,13 @@ const CONFIG = Object.freeze({
 
     // ── Colors ────────────────────────────────────────────────
     COLORS: {
-        DARK:  Object.freeze({ road: "#5d5c5c", grass: "#d2b96d", rumble: "red",   strip: "",      tunnel: "darkblue" }),
+        DARK:  Object.freeze({ road: "#5d5c5c", grass: "#d2b96d", rumble: "grey",   strip: "",      tunnel: "darkblue" }),
         LIGHT: Object.freeze({ road: "#666666", grass: "#e2c46a", rumble: "white", strip: "white", tunnel: "blue"     }),
     },
     
     COLORS2: { 
-        DARK:  Object.freeze({ road: "#5d5c5c", grass: "#716540", rumble: "red",   strip: "",      tunnel: "darkblue" }),
-        LIGHT: Object.freeze({ road: "#666666", grass: "#8a7840", rumble: "white", strip: "white", tunnel: "blue"     }),
+        DARK:  Object.freeze({ road: "#5d5c5c", grass: "#98be7b", rumble: "grey",   strip: "",      tunnel: "darkblue" }),
+        LIGHT: Object.freeze({ road: "#666666", grass: "#9ec888", rumble: "white", strip: "white", tunnel: "blue"     }),
     },
 
     // ── Player ────────────────────────────────────────────────

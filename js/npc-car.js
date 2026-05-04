@@ -36,7 +36,10 @@ class NpcCar {
 
         this.sprite       = new Sprite();
         this.sprite.image = image;
-        this.sprite.collidable = false;  // colisión manejada manualmente
+        //espejar sprite segun de que lado de la carretera este
+        if (laneX <= 0) this.sprite.flipX = true;
+        this.sprite.collidable = false;
+          // colisión manejada manualmente
     }
 
     /**

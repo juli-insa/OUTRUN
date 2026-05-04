@@ -8,18 +8,21 @@
 const TOTAL_LAPS = 2;
 
 const HUD = Object.freeze({
-    BAR_H:        80,
-    PAD_X:        18,
+    BAR_H:        70,
+    PAD_X:        20,
     LABEL_SIZE:   23,
-    SCORE_SIZE:   32,
-    STAGE_SIZE:   28,
-    TIMER_SIZE:   46,
-    SPEED_SIZE:   44,
-    SPEED_X:      80,
-    FONT:         "monospace",
-    LABEL_COLOR:  "#ffffff",
+    SCORE_SIZE:   25,
+    STAGE_SIZE:   20,
+    TIMER_SIZE:   23,
+    SPEED_SIZE:   34,
+    SPEED_X:      140,
+    SCORE_X:      500,
+    TIME_X:       160,
+    FONT:         "'Press Start 2P', monospace",
+    LABEL_COLOR:  "#ffe2e2", 
+    LABEL_COLOR2: "#ff8438",
     SCORE_COLOR:  "#868686",
-    SPEED_COLOR:  "#ffffff",
+    SPEED_COLOR:  "#ff4000",
     TIMER_NORMAL: "#fffc58",
     TIMER_LOW:    "#ff0000",
 });
@@ -148,7 +151,7 @@ class GameplayScene {
         // ── 7. Render ─────────────────────────────────────────
         render.clear(0, 0, W, H);
         render.save();
-        this.#mgr.sky.update(player.x);
+        this.#mgr.sky.update( activeSegment ? activeSegment.curve : 0);
         this.#mgr.sky.render(render.renderingContext);
         road.render(render, camera, player);
         player.render(render, camera, road.width);
@@ -165,17 +168,20 @@ class GameplayScene {
         ctx.moveTo(0, barY);
         ctx.lineTo(W, barY);
 
-        this.#label(ctx, "SCORE", HUD.PAD_X, barY - 500);
-        this.#value(ctx, this.#padScore(state.score), HUD.PAD_X, barY - 480, HUD.SCORE_COLOR, HUD.SCORE_SIZE);
+        this.#label(ctx, "SCORE", HUD.SCORE_X, barY - 500, "right");
+        this.#value(ctx, this.#padScore(state.score), HUD.SCORE_X, barY - 500, HUD.SCORE_COLOR, HUD.SCORE_SIZE , "left");
 
         const cx = HUD.SPEED_X;
-        this.#label(ctx, "KM/H", cx, barY + 10, "center");
-        this.#value(ctx, String(state.speed).padStart(3, "0"), cx, barY + 26, HUD.SPEED_COLOR, HUD.SPEED_SIZE, "center");
+        this.#label(ctx, "km/h", cx, barY + 10, "left");
+        this.#value(ctx, String(state.speed).padStart(3, "0"), cx, barY + 10, HUD.SPEED_COLOR, HUD.SPEED_SIZE, "right");
 
         ctx.font         = `bold ${HUD.STAGE_SIZE}px ${HUD.FONT}`;
         ctx.fillStyle    = "#eb3737";
         ctx.textAlign    = "right";
         ctx.textBaseline = "top";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.strokeText(`STAGE ${this.#stage}/${CONFIG.SCENES.TOTAL_STAGES}`, W - HUD.PAD_X, barY + 20);
         ctx.fillText(`STAGE ${this.#stage}/${CONFIG.SCENES.TOTAL_STAGES}`, W - HUD.PAD_X, barY + 20);
 
         const timeLeft   = state.timeLeft;
@@ -183,22 +189,27 @@ class GameplayScene {
         const timerColor = isLow ? HUD.TIMER_LOW : HUD.TIMER_NORMAL;
         const pulse      = isLow && Math.floor(Date.now() / 250) % 2 === 0;
 
-        this.#label(ctx, "TIME", W - HUD.PAD_X, barY - 500, "right");
+        this.#label(ctx, "TIME", HUD.TIME_X, barY - 500, "right");
         if (!pulse) {
             ctx.font         = `bold ${HUD.TIMER_SIZE}px ${HUD.FONT}`;
             ctx.fillStyle    = timerColor;
-            ctx.textAlign    = "right";
-            ctx.textBaseline = "top";
-            ctx.fillText(String(timeLeft).padStart(2, "0"), W - HUD.PAD_X, barY - 480);
+            ctx.textAlign    = "left";
+            ctx.textBaseline = "top";            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.strokeText(String(timeLeft).padStart(2, "0"), HUD.TIME_X, barY - 500);   
+            ctx.fillText(String(timeLeft).padStart(2, "0"), HUD.TIME_X, barY - 500);
         }
         ctx.restore();
     }
 
     #label(ctx, text, x, y, align = "left") {
         ctx.font = `bold ${HUD.LABEL_SIZE}px ${HUD.FONT}`;
-        ctx.fillStyle = HUD.LABEL_COLOR;
+        ctx.fillStyle = HUD.LABEL_COLOR; 
         ctx.textAlign = align;
         ctx.textBaseline = "top";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.strokeText(text, x, y);
         ctx.fillText(text, x, y);
     }
 
@@ -207,6 +218,9 @@ class GameplayScene {
         ctx.fillStyle = color;
         ctx.textAlign = align;
         ctx.textBaseline = "top";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.strokeText(text, x, y);
         ctx.fillText(text, x, y);
     }
 

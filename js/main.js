@@ -55,9 +55,11 @@ resource
     .add("tree1",       "./assets/foliagePack_005.png")
     .add("car",         "./assets/carnuevo.png")
     .add("cardobla",    "./assets/cardoblanuevo.png")
-    .add("enemigo",      "./assets/car2.png")
+    .add("enemigo",      "./assets/enemy.png")
     .add("finish-line", "./assets/finish.png")
     .add("tree2",       "./assets/foliagePack_013.png")
+    .add("tree3",       "./assets/foliagePack_0056.png")
     .add("nuve",        "./assets/nuve.png")
     .add("semaforo",     "./assets/semaforoanim.png")
+    .add("arbusto",     "./assets/arbustoplaya.png")
     .load(() => requestAnimationFrame((t) => init(t)));
