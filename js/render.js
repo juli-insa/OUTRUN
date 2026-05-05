@@ -123,8 +123,9 @@ class Render {
      * @param {number} destX
      * @param {number} destY
      * @param {number} clip
+     * @param {boolean} [animate=true]
      */
-    drawSprite(sprite, camera, player, _enemy, roadWidth, scale, destX, destY, clip) {
+    drawSprite(sprite, camera, player, _enemy, roadWidth, scale, destX, destY, clip, animate = true) {
         const mid     = camera.screen.midpoint;
         const FACTOR  = 1 / 3;
         const offsetY = sprite.offsetY || 1;
@@ -140,7 +141,7 @@ class Render {
         if (clipH >= destH) return;
 
         if (sprite instanceof AnimatedSprite) {
-            sprite.updateAnimation();
+            sprite.updateAnimation(animate);
             const fc      = sprite.getFrameCoords();
             const srcH    = fc.height - (fc.height * clipH / destH);
             this.#ctx.drawImage(sprite.image, fc.x, fc.y, fc.width, srcH, drawX, drawY, drawW, drawH);

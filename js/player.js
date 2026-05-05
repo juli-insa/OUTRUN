@@ -106,6 +106,8 @@ class Player {
         const ctx    = render.renderingContext;
         const sprite = this.currentSprite;
 
+        const animate = camera.isAccelerating;
+
         if (this.isCardobla && this.isMovingLeft) {
             const FACTOR = 1 / 3;
             const sw    = sprite.width  || 64;
@@ -116,10 +118,10 @@ class Player {
             ctx.translate(cx, 0);
             ctx.scale(-1, 1);
             ctx.translate(-cx, 0);
-            render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0);
+            render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0, animate);
             ctx.restore();
         } else {
-            render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0);
+            render.drawSprite(sprite, camera, this, null, roadWidth, scale, destX, destY, 0, animate);
         }
     }
 }

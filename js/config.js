@@ -28,6 +28,8 @@ const CONFIG = Object.freeze({
         RUMBLE_LENGTH:  13,
         WIDTH:          2000,
         TOTAL_SEGMENTS: 4602,
+        //mas segmentos para la etapa 2, con más curvas y NPCs
+        STAGE_2_TOTAL_SEGMENTS: 8000,
         /** How many segments are drawn ahead */
         VISIBLE_SEGMENTS: 500,
     },

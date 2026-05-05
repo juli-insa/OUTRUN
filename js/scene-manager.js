@@ -39,7 +39,8 @@ class SceneManager {
         this.#state    = state;
         this.#sky      = sky;
         const npcImage = resource.get("enemigo");
-        this.#npcCars  = NpcCar.createFleet(road, npcImage);
+        // Flota se crea en scene-gameplay por stage
+        this.#npcCars  = [];
 
         this.#intro    = new IntroScene(this);
         this.#gameplay = new GameplayScene(this);
@@ -57,6 +58,7 @@ class SceneManager {
     get state()    { return this.#state;    }
     get sky()      { return this.#sky;      }
     get npcCars()  { return this.#npcCars;  }
+    set npcCars(v) { this.#npcCars = v;     }  // ← agregar esto
     get current()  { return this.#current;  }
 
     /**

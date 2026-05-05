@@ -123,7 +123,9 @@ class AnimatedSprite extends Sprite {
         return cols * rows;
     }
 
-    updateAnimation() {
+    updateAnimation(animate = true) {
+        if (!animate) return;
+
         if (this.totalFrames === 1 && this.frameWidth && this.frameHeight) {
             this.totalFrames = this.#autoTotalFrames();
         }

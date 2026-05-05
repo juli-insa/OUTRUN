@@ -119,19 +119,19 @@ class NpcCar {
      *   - jugador acelerando al máximo: ~2.5 steps/frame
      *   - NPCs a 0.5–0.9: siempre más lentos en crucero, el jugador los pasa
      *
-     * @param {Road}             road
+       * @param {Road}             road
      * @param {HTMLImageElement} image
+     * @param {number}           count
      * @returns {NpcCar[]}
      */
-    static createFleet(road, image) {
+    static createFleet(road, image, count) {
         const trackLen = road.trackLength;
-        const count    = 10;
         const lanes    = [-0.38, 0.38];
         const cars     = [];
 
         for (let i = 0; i < count; i++) {
-            // Distribuir uniformemente, saltando la zona de salida
-            const startCursor = trackLen * (0.05 + i * 0.09);
+            // Distribuir uniformemente alrededor del circuito
+            const startCursor = (i / count) * trackLen;
             const laneX       = lanes[i % 2];
             // Velocidades escalonadas: 0.55 a 0.85 steps/frame
             // El jugador con aceleración (>1 step) los alcanza a todos

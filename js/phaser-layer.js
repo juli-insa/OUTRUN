@@ -59,24 +59,31 @@ class PhaserMainScene extends Phaser.Scene {
         this.load.audio("sfx-start",      ["./assets/audio/start.ogg",    "./assets/audio/start.mp3"]);
         this.load.audio("sfx-checkpoint", ["./assets/audio/checkpoint.ogg","./assets/audio/checkpoint.mp3"]);
         this.load.audio("sfx-finish",     ["./assets/audio/finish.ogg",   "./assets/audio/finish.mp3"]);
-        this.load.audio("sfx-engine",     ["./assets/audio/engine.ogg",   "./assets/audio/engine.mp3"]);
+        this.load.audio("sfx-engine",     ["./assets/audio/moto.ogg",   "./assets/audio/moto.mp3"]);
         this.load.audio("sfx-timeup",     ["./assets/audio/timeup.ogg",   "./assets/audio/timeup.mp3"]);
     }
 
-    create() {
-        const W = this.scale.width;
-        const H = this.scale.height;
+   create() {
+    const W = this.scale.width;
+    const H = this.scale.height;
 
-        // ── Audio ──────────────────────────────────────────────
-        this._music   = null;
-        this._sounds  = {};
+    // ── Audio ──────────────────────────────────────────────
+    this._music  = null;
+    this._sounds = {};   // ← inicializar primero
 
-        const sfxKeys = ["sfx-start","sfx-checkpoint","sfx-finish","sfx-engine","sfx-timeup"];
-        for (const k of sfxKeys) {
-            if (this.cache.audio.exists(k)) {
-                this._sounds[k] = this.sound.add(k, { volume: 0.7 });
-            }
+    // SFX normales (sin loop)
+    const sfxKeys = ["sfx-start", "sfx-checkpoint", "sfx-finish", "sfx-timeup"];
+    for (const k of sfxKeys) {
+        if (this.cache.audio.exists(k)) {
+            this._sounds[k] = this.sound.add(k, { volume: 0.7 });
         }
+    }
+
+    // Motor en loop separado
+    if (this.cache.audio.exists("sfx-engine")) {
+        this._sounds["sfx-engine"] = this.sound.add("sfx-engine", { volume: 0.7, loop: true });
+    }
+        
 
         // ── Particles ──────────────────────────────────────────
         // Use a tiny graphics texture for confetti rectangles
@@ -134,6 +141,10 @@ class PhaserMainScene extends Phaser.Scene {
     update() {
         // Gamepad axes are read on demand via phaserLayer.gamepad.axes
     }
+    // En PhaserMainScene, agrega:
+_stopSFX(key) {
+    this._sounds[key]?.stop();
+}
 
     // ── Internal helpers ──────────────────────────────────────
 
@@ -235,6 +246,8 @@ class PhaserLayer {
             playMusic: (key, loop = true) => this.#whenReady(() => this.#scene._playMusic(key, loop)),
             stopMusic: ()                 => this.#whenReady(() => this.#scene._stopMusic()),
             playSFX:  (key)               => this.#whenReady(() => this.#scene._playSFX(key)),
+            // En el #makeAudioAPI() de PhaserLayer, agrega:
+stopSFX: (key) => this.#whenReady(() => this.#scene._stopSFX(key)),
         };
     }
 

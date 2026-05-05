@@ -104,9 +104,11 @@ class SkyLayer {
         ctx.globalAlpha = 1;
         ctx.restore();
     }
-}
 
-// ── Sky ───────────────────────────────────────────────────────────────────────
+
+
+
+}
 
 class Sky {
     /** @type {HTMLImageElement} */
@@ -117,6 +119,8 @@ class Sky {
     #near    = null;
     /** @type {SkyLayer} */
     #bushes  = null;
+    /** @type {SkyLayer} */
+    #mountains = null;
 
    // #prevPlayerX = 0;
 
@@ -167,6 +171,16 @@ class Sky {
             count:       4,
             parallax:    150,
         }, W);
+
+        this.#mountains = new SkyLayer({
+            y:           skyH * 0.68,
+            ySpread:     skyH * 0.05,
+            scale:       2,
+            scaleSpread: 0.1,
+            alpha:       0.7,
+            count:       4,
+            parallax:    150,
+        }, W);
     }     
     setStage(stage) {
         this.#stage = stage;
@@ -183,6 +197,9 @@ class Sky {
         this.#near.update( curve);
         if (this.#stage === 1 && this.#bushes) {
             this.#bushes.update( curve);
+        }
+        if (this.#stage === 2 && this.#mountains) {
+            this.#mountains.update( curve);
         }
        // this.#prevPlayerX = playerX;
     }
@@ -216,8 +233,12 @@ class Sky {
         // Clouds — far first (painter's order)
         this.#far.render(ctx,  this.#img);
         this.#near.render(ctx, this.#img);
+
         if (this.#stage === 1 && this.#bushes) {
             this.#bushes.render(ctx, resource.get("arbusto"));
+        }
+        if (this.#stage === 2 && this.#mountains) {
+            this.#mountains.render(ctx, resource.get("mountain"));
         }
     }
 }

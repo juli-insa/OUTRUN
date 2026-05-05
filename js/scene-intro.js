@@ -115,6 +115,27 @@ class IntroScene {
         ctx.fillStyle = "#ffffff";
         ctx.font      = "16px 'Press Start 2P', monospace";
         ctx.fillText("REMAKE by JULIETA INSAURRALDE", W / 2, H * 0.30);
+
+           ctx.font      = "bold 20px 'Press Start 2P', monospace";
+                ctx.fillStyle = "rgba(250, 46, 46, 0.8)";
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 2;
+                ctx.fillText("PRESS [ A ] TO ACCELERATE", W / 2, H * 0.40);
+                ctx.strokeText("PRESS [ A ] TO ACCELERATE", W / 2, H * 0.40);
+                // BORDE NEGRO
+                 ctx.bold = "bold 20px 'Press Start 2P', monospace";
+                ctx.fillText("PRESS [ A ] TO ACCELERATE", W / 2 + 2, H * 0.40 + 2);
+
+                 ctx.font      = "bold 20px 'Press Start 2P', monospace";
+                ctx.fillStyle = "rgba(250, 46, 46, 0.8)";
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 2;
+                ctx.fillText("MOVE [ JOYSTICK ] TO LEFT AND RIGHT", W / 2, H * 0.50);
+                ctx.strokeText("MOVE [ JOYSTICK ] TO LEFT AND RIGHT", W / 2, H * 0.50);
+                // BORDE NEGRO
+                 ctx.bold = "bold 20px 'Press Start 2P', monospace";
+                ctx.fillText("MOVE [ JOYSTICK ] TO LEFT AND RIGHT", W / 2 + 2, H * 0.50 + 2);
+
         ctx.restore();
 
         // Blinking prompt
@@ -134,11 +155,17 @@ class IntroScene {
                 ctx.fillStyle = "rgba(0, 255, 136, 0.8)";
                 ctx.strokeStyle = "black";
                 ctx.lineWidth = 2;
-                ctx.fillText("PRESS [ A ] TO START", W / 2, H * 0.42);
-                ctx.strokeText("PRESS [ A ] TO START", W / 2, H * 0.42);
+                ctx.fillText("PRESS [ A ] TO START", W / 2, H * 0.60);
+                ctx.strokeText("PRESS [ A ] TO START", W / 2, H * 0.60);
                 // BORDE NEGRO
                  ctx.bold = "bold 20px 'Press Start 2P', monospace";
-                ctx.fillText("PRESS [ A ] TO START", W / 2 + 2, H * 0.42 + 2);
+                ctx.fillText("PRESS [ A ] TO START", W / 2 + 2, H * 0.60 + 2);
+
+              
+
+                
+
+                
               //  ctx.fillStyle = "#ffffff";
                 //ctx.font         = "bold 22px monospace";
                // ctx.fillText("[ ENTER ] to START", W / 2, H * 0.42);

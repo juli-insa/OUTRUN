@@ -21,9 +21,10 @@ class Camera {
     /** Ground height (used to follow road hills) */
     h = CONFIG.CAMERA.HEIGHT;
 
-    cursor       = 0;
-    deltaZ       = 0;
-    acceleration = 0;
+    cursor          = 0;
+    deltaZ          = 0;
+    acceleration    = 0;
+    isAccelerating = false;
 
     screen = new ScreenInfo();
 
@@ -59,6 +60,8 @@ class Camera {
             || gp.isDown(GamepadButtons.B)
             || gp.isDown(GamepadButtons.LT)
             || gp.axes().ly > 0.3;
+
+        this.isAccelerating = accelInput;
 
         if (accelInput) {
             this.cursor += step + this.acceleration;

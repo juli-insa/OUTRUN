@@ -62,4 +62,5 @@ resource
     .add("nuve",        "./assets/nuve.png")
     .add("semaforo",     "./assets/semaforoanim.png")
     .add("arbusto",     "./assets/arbustoplaya.png")
+    .add("mountain",     "./assets/mountain.png")
     .load(() => requestAnimationFrame((t) => init(t)));

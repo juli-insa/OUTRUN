@@ -36,6 +36,10 @@ class GameplayScene {
     #lap              = 0;
     #crossingCooldown = false;
     #prevSpeed        = 0;
+    #npcDelay     = 3000;  // ms antes de que aparezcan los NPCs
+    #npcTimer     = 0;
+    #npcActive    = false;
+    #enginePlaying = false;
 
     constructor(mgr) { this.#mgr = mgr; }
 
@@ -56,14 +60,35 @@ class GameplayScene {
         this.#crossingCooldown = false;
         this.#prevSpeed        = 0;
 
+            // ── NPC delay ──────────────────────────────────────────
+    this.#npcTimer  = 0;
+    this.#npcActive = false;  // ← NPCs inactivos al inicio
+
         road.clear();
         road.create(CONFIG.ROAD.TOTAL_SEGMENTS, stage);
         this.#mgr.sky.setStage(stage);
-        phaserLayer.audio.playMusic("music-gameplay");
+
+        // Limpiar NPCs anteriores
+        this.#mgr.npcCars.forEach(npc => npc.detach());
+        this.#mgr.npcCars = [];
+
+        // Crear nueva flota según stage
+        const npcCount = stage === 1 ? 10 : 30;
+        const npcImage = resource.get("enemigo");
+        this.#mgr.npcCars = NpcCar.createFleet(road, npcImage, npcCount);
+
+       
+        if (stage === 1) phaserLayer.audio.playMusic("music-gameplay");
     }
 
     exit() {
         phaserLayer.audio.stopMusic();
+        // Limpiar NPCs al salir
+         this.#enginePlaying = false;
+        this.#mgr.npcCars.forEach(npc => npc.detach());
+        this.#mgr.npcCars = [];
+        phaserLayer.audio.stopSFX("sfx-engine");
+this.#enginePlaying = false;
     }
 
     update(deltaMs) {
@@ -78,6 +103,8 @@ class GameplayScene {
         const activeSegment = road.getSegment(camera.cursor);
         const camSegIndex   = activeSegment?.index ?? -1;
 
+        
+
         // ── 2. Colisión con árboles — ANTES de camera.update ──
         if (!player.isStunned) {
             if (road.checkSpriteCollision(player, camSegIndex)) {
@@ -86,6 +113,14 @@ class GameplayScene {
             }
         }
 
+        // ── 3. NPCs: esperar delay antes de activarlos ─────────
+if (!this.#npcActive) {
+    this.#npcTimer += deltaMs;
+    if (this.#npcTimer >= this.#npcDelay) {
+        this.#npcActive = true;
+    }
+}
+if (this.#npcActive) {
         // ── 3. Colisión con NPCs — también antes de mover ──────
         for (const npc of npcCars) {
             npc.update(road, camera.acceleration);
@@ -94,21 +129,34 @@ class GameplayScene {
             }
             npc.attach(road);
         }
+    }
 
         // ── 4. Cámara: si está stunned, frenar; si no, input normal
         if (player.isStunned) {
             camera.acceleration *= 0.80;
             if (camera.acceleration < 0) camera.acceleration = 0;
+            camera.isAccelerating = false;
             // Avance mínimo para que la escena no se congele visualmente
             camera.cursor += road.segmentLength * 0.2;
             if (camera.cursor >= road.trackLength) camera.cursor -= road.trackLength;
-        } else {
+      } else {
             camera.update(road);
         }
 
+        // ── Engine sound ───────────────────────────────────────
+        if (camera.isAccelerating && !this.#enginePlaying) {
+            phaserLayer.audio.playSFX("sfx-engine");
+            this.#enginePlaying = true;
+        } else if (!camera.isAccelerating && this.#enginePlaying) {
+            phaserLayer.audio.stopSFX("sfx-engine");
+            this.#enginePlaying = false;
+        }
+
+
+
         // ── 5. Player update (drift + input) ──────────────────
         player.currentCurve = activeSegment ? activeSegment.curve : 0;
-        player.update(speed);
+       player.update(speed, deltaMs);  // ✓ el player se mueve relativo a la cámara, no al segmento
 
         // ── 6. Finish-line / lap ───────────────────────────────
         const currentIndex = camSegIndex;
@@ -161,6 +209,8 @@ class GameplayScene {
         for (const npc of npcCars) npc.detach();
 
         this.#prevSpeed = speed;
+        // Al final del update, siempre limpiar aunque no estén activos
+for (const npc of npcCars) npc.detach();
     }
 
     #drawHUD(ctx, W, H, state) {
